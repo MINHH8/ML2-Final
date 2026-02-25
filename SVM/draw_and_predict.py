@@ -15,7 +15,7 @@ class DrawingApp:
         # Load model và scaler
         # self.model = joblib.load("./svm_hog_model.joblib")
         # self.scaler = joblib.load("./scaler.joblib")
-        MODEL_DIR = Path(r"D:\ML2-Final\saved_models")
+        MODEL_DIR = Path(r"C:\Users\vuong\OneDrive\Desktop\Ml2\ML2-Final\SVM")
         self.model = joblib.load(MODEL_DIR / "svm_hog_model.joblib")
         self.scaler = joblib.load(MODEL_DIR / "scaler.joblib")
         
@@ -23,7 +23,7 @@ class DrawingApp:
         self.canvas_width = 600
         self.canvas_height = 400
         self.canvas = tk.Canvas(root, width=self.canvas_width, height=self.canvas_height, 
-                               bg='black', cursor='cross')
+                                bg='black', cursor='cross')
         self.canvas.pack(pady=10)
         
         # PIL Image để vẽ
