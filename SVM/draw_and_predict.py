@@ -19,22 +19,22 @@ class DrawingApp:
         self.model = joblib.load(MODEL_DIR / "svm_hog_model.joblib")
         self.scaler = joblib.load(MODEL_DIR / "scaler.joblib")
         
-        # Thiết lập canvas
+        # Thiết lập canvas, visible drawing surface
         self.canvas_width = 600
         self.canvas_height = 400
         self.canvas = tk.Canvas(root, width=self.canvas_width, height=self.canvas_height, 
                                 bg='black', cursor='cross')
         self.canvas.pack(pady=10)
         
-        # PIL Image để vẽ
+        # PIL Image để vẽ, "real" input with 8 bit grayscale
         self.image = Image.new('L', (self.canvas_width, self.canvas_height), 0)
         self.draw = ImageDraw.Draw(self.image)
         
-        # Biến theo dõi chuột
+        # Biến theo dõi chuột movement
         self.last_x = None
         self.last_y = None
         
-        # Bind sự kiện chuột
+        # Bind sự kiện chuột button click
         self.canvas.bind('<Button-1>', self.start_draw)
         self.canvas.bind('<B1-Motion>', self.paint)
         self.canvas.bind('<ButtonRelease-1>', self.reset_position)
@@ -59,17 +59,17 @@ class DrawingApp:
         self.result_label = tk.Label(root, text="Draw a number in range 0-9",
                                     font=('Arial', 14))
         self.result_label.pack(pady=10)
-        
-        # Label hướng dẫn
+
     
-    def start_draw(self, event):
+    def start_draw(self, event):    
+        '''store starting mouse position'''
         self.last_x = event.x
         self.last_y = event.y
     
     def paint(self, event):
-        if self.last_x and self.last_y:
+        if self.last_x is not None and self.last_y is not None:
             x, y = event.x, event.y
-            # Vẽ trên canvas
+            # Vẽ trên canvas (user see)
             self.canvas.create_line(self.last_x, self.last_y, x, y,
                                    fill='white', width=20, capstyle=tk.ROUND,
                                    smooth=tk.TRUE)
@@ -79,6 +79,7 @@ class DrawingApp:
             self.last_y = y
     
     def reset_position(self, event):
+        '''clear last coordinate record'''
         self.last_x = None
         self.last_y = None
     
@@ -102,16 +103,15 @@ class DrawingApp:
         # Tìm bounding box
         coords = np.column_stack(np.where(img > 0))
         if len(coords) == 0:
-            return None
-            
+            return None  
         y_min, x_min = coords.min(axis=0)
-        y_max, x_max = coords.max(axis=0)
+        y_max, x_max = coords.max(axis=0)   
         digit = img[y_min:y_max+1, x_min:x_max+1]
         
         # Resize to 20x20
         digit = resize(digit, (20, 20), anti_aliasing=True)
         
-        # Đặt vào canvas 28x28
+        # Đặt vào canvas 28x28, mimic style 28x28 NMIST image dataset
         canvas = np.zeros((28, 28))
         canvas[4:24, 4:24] = digit
         
@@ -124,7 +124,7 @@ class DrawingApp:
         return canvas
     
     def predict(self):
-        # Lấy image từ PIL
+        # Lấy image từ PIL, convert to numpy array
         img_array = np.array(self.image)
         
         # Preprocess
